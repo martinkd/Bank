@@ -1,55 +1,75 @@
 package com.martin.bank.managers;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
 
 import com.martin.bank.accounts.Account;
 import com.martin.bank.accounts.Payment;
 import com.martin.bank.customers.Customer;
+import com.martin.bank.sql.DataQuery;
+import com.martin.bank.sql.DataUpdate;
 
 public class Manager {
-	int id;
-	String name;
-	static Map<Integer, Customer> customers = new HashMap<Integer, Customer>();;
-	Map<Integer, Account> accounts;
+	private int id;
+	private String name;
+	private Customer customer;
+	private DataUpdate updateData = new DataUpdate();
+	private DataQuery queryData = new DataQuery();
 
-	public Customer addCustomer() {
-		Customer customer = new Customer();
-		String name = null;
+	public Manager() {};
+
+	public Manager(String name) {
+		this.name = name;
+	}
+
+	private Manager bigBoss() throws SQLException {
+		return queryData.getBigBoss();
+	}
+
+	public Customer addCustomer(String name) throws SQLException {
+		customer = new Customer();
 		customer.setName(name);
-		customers.put(customer.getId(), customer);
+		updateData.addCustomer(customer, bigBoss());
 		return customer;
 	}
 
-	public boolean removeCustomer(int customerId) {
-		boolean canRemove = customers.containsKey(customerId);
+	public boolean removeCustomer(int customerId) throws SQLException {
+		boolean canRemove = queryData.contains(customerId, "customers");
 		if (canRemove) {
-			customers.remove(customerId);
+			updateData.removeCustomer(customerId);
 		}
 		return canRemove;
 	}
 
-	public Account addAccount(int customerId) {
-		Customer customer = customers.get(customerId);
-		Account paymentAccount = new Payment();
-		accounts = customer.getAccounts();
-		accounts.put(paymentAccount.getId(), paymentAccount);
-		customer.setAccounts(accounts);
-		return paymentAccount;
+	public boolean addAccount(int customerId) throws SQLException {
+		boolean canAdd = queryData.contains(customerId, "customers");
+		if (canAdd) {
+			Account paymentAccount = new Payment();
+			updateData.addAccount(paymentAccount, customerId);
+		}
+		return canAdd;
 	}
 
-	public boolean removeAccount(int customerId, int accountId) {
-		Customer customer = customers.get(customerId);
-		accounts = customer.getAccounts();
-		boolean canRemove = accounts.containsKey(accountId);
+	public boolean removeAccount(int customerId, int accountId) throws SQLException {
+		boolean canRemove = queryData.contains(customerId, "customers") && queryData.contains(accountId, "accounts");
 		if (canRemove) {
-			accounts.remove(accountId);
-			customer.setAccounts(accounts);
+			updateData.removeAccount(accountId);
 		}
 		return canRemove;
 	}
 
-	public void clearCustomers() {
-		customers.clear();
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }
