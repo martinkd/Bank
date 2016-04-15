@@ -1,26 +1,25 @@
 package com.martin.bank.accounts;
 
-public abstract class Account {
-	static int id = 0;
-	String type;
+public class Account {
+	private int id;
 	double amount;
 	double rate;
 	double interset;
+	String type;
+	private int customerId;
 	
-	public Account () {
-		id +=1;
-	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		Account.id = id;
-	}
 	public String getType() {
 		return type;
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	public double getAmount() {
 		return amount;
@@ -40,5 +39,10 @@ public abstract class Account {
 	public void setInterset(double interset) {
 		this.interset = interset;
 	}
-	
+	public int getCustomerId() {
+		return customerId;
+	}
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
+	}
 }

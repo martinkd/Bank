@@ -6,8 +6,10 @@ import java.util.Map;
 import com.martin.bank.accounts.Account;
 
 public class Customer {
-	static int id = 0;
+	private int id;
 	private String name;
+	private int managerId;
+	
 	public static Map<Integer, Account> accounts = new HashMap<Integer, Account>();
 	
 	public Map<Integer, Account> getAccounts() {
@@ -18,11 +20,12 @@ public class Customer {
 		Customer.accounts = accounts;
 	}
 	
-	public Customer() {
-		id +=1;
-	}
 	public int getId() {
 		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	public String getName() {
@@ -31,5 +34,13 @@ public class Customer {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getManagerId() {
+		return managerId;
+	}
+
+	public void setManagerId(int managerId) {
+		this.managerId = managerId;
 	}
 }
