@@ -19,13 +19,20 @@ public class DataAccess {
 		createTables();
 	}
 
+	public Connection getMyConn() {
+		return myConn;
+	}
+
+	public void setMyConn(Connection myConn) {
+		this.myConn = myConn;
+	}
+
 	private void createTables() {
 		try {
 			connectDb();
 			createManagerTable();
 			createCustomersTable();
 			createAccountsTable();
-			System.out.println("Tables OK");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -38,7 +45,7 @@ public class DataAccess {
 	
 	private void createManagerTable() throws SQLException{
 		String sql = "CREATE TABLE IF NOT EXISTS manager ("
-				+ "id INT,"
+				+ "id INT NOT NULL AUTO_INCREMENT,"
 				+ "name VARCHAR(45),"
 				+ "PRIMARY KEY(id)"
 				+ ");";
@@ -47,27 +54,41 @@ public class DataAccess {
 	
 	private void createCustomersTable() throws SQLException {
 		String sql = "CREATE TABLE IF NOT EXISTS customers ("
-				+ "id INT,"
+				+ "id INT NOT NULL AUTO_INCREMENT,"
 				+ "name VARCHAR(45),"
 				+ "managerId INT,"
-				+ "PRIMARY KEY(id),"
-				+ "FOREIGN KEY(managerId) REFERENCES manager(id)"
+				+ "PRIMARY KEY(id)"
 				+ ");";
 		myStmt.execute(sql);
 	}
 	
 	private void createAccountsTable() throws SQLException {
 		String sql = "CREATE TABLE IF NOT EXISTS accounts ("
-				+ "id INT,"
+				+ "id INT NOT NULL AUTO_INCREMENT,"
 				+ "type VARCHAR(45),"
 				+ "amount DOUBLE,"
 				+ "interest DOUBLE,"
 				+ "customerId INT,"
-				+ "PRIMARY KEY(id),"
-				+ "FOREIGN KEY(customerId) REFERENCES customers(id)"
+				+ "PRIMARY KEY(id)"
 				+ ");";
 		myStmt.execute(sql);
 	}
-
+	
+	public void deleteAllTables() throws SQLException {
+		connectDb();
+		dropAccounts();
+		dropCustomers();
+		dropManager();
+	}
+	
+	private void dropAccounts() throws SQLException {
+		myStmt.executeUpdate("DROP TABLE accounts;");
+	}
+	private void dropCustomers() throws SQLException {
+		myStmt.executeUpdate("DROP TABLE customers;");
+	}
+	private void dropManager() throws SQLException {
+		myStmt.executeUpdate("DROP TABLE manager;");
+	}
 }
 
