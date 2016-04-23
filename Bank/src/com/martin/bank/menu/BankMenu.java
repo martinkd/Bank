@@ -19,13 +19,14 @@ public class BankMenu {
 			System.out.println(customer);
 		}
 		
-		manager.addAccount(1);
-		manager.addAccount(1);
-		manager.addAccount(2);
-		manager.addAccount(1);
-		
 		Customer gosho = manager.getCustomer(1);
-		System.out.println(gosho.getId());
+		manager.addPaymentAcc(gosho.getId());
+		manager.addCreditAcc(gosho.getId());
+		manager.addSavingsAcc(gosho.getId());
+		
+		Customer ilcho = manager.getCustomer(2);
+		manager.addSavingsAcc(ilcho.getId());
+		
 		System.out.println(manager.getCustomerAccountIds(gosho.getId()));
 		System.out.println(manager.getAccount(gosho.getId(), 3));
 	

@@ -4,6 +4,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.martin.bank.accounts.Account;
+import com.martin.bank.accounts.Credit;
+import com.martin.bank.accounts.Payment;
+import com.martin.bank.accounts.Savings;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataQuery;
 import com.martin.bank.sql.DataUpdate;
@@ -40,10 +43,31 @@ public class Manager {
 		return canRemove;
 	}
 
-	public boolean addAccount(int customerId) throws SQLException {
+	/*public boolean addAccount(int customerId) throws SQLException {
 		boolean canAdd = queryData.contains(customerId, "customers");
 		if (canAdd) {
-			Account account = new Account();
+			Account account = new Payment();
+			updateData.addAccount(account, customerId);
+		}
+		return canAdd;
+	}
+	*/
+	
+	public boolean addPaymentAcc(int customerId) throws SQLException {
+		return addAccountIfCan(customerId, new Payment());
+	}
+	
+	public boolean addCreditAcc(int customerId) throws SQLException {
+		return addAccountIfCan(customerId, new Credit());
+	}
+	
+	public boolean addSavingsAcc(int customerId) throws SQLException {
+		return addAccountIfCan(customerId, new Savings());
+	}
+	
+	private boolean addAccountIfCan(int customerId, Account account) throws SQLException {
+		boolean canAdd = queryData.contains(customerId, "customers");
+		if (canAdd) {
 			updateData.addAccount(account, customerId);
 		}
 		return canAdd;

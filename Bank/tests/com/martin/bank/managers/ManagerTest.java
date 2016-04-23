@@ -48,23 +48,23 @@ public class ManagerTest {
 	}
 
 	@Test
-	public void testAddAccount() throws SQLException {
+	public void testAddPaymentAcc() throws SQLException {
 		updateData.addManager();
 		Manager boss = query.getBigBoss();
-		assertFalse("should not add account because no customer for it", boss.addAccount(1));
+		assertFalse("should not add account because no customer for it", boss.addPaymentAcc(1));
 		boss.addCustomer("first customer");
-		assertTrue("should account to first customer", boss.addAccount(1));
-		assertFalse("should not add account because no customer for it", boss.addAccount(0));
+		assertTrue("should account to first customer", boss.addPaymentAcc(1));
+		assertFalse("should not add account because no customer for it", boss.addPaymentAcc(0));
 	}
 
 	@Test
-	public void testRemoveAccount() throws SQLException {
+	public void testRemovePaymentAcc() throws SQLException {
 		updateData.addManager();
 		Manager boss = query.getBigBoss();
 		assertFalse("should not remove account if there is no such customer", boss.removeAccount(1, 1));
 		boss.addCustomer("firstCustomer");
 		assertFalse("should not remove account if there is no such account", boss.removeAccount(1, 1));
-		boss.addAccount(1);
+		boss.addPaymentAcc(1);
 		assertTrue("should remove account", boss.removeAccount(1, 1));
 	}
 
@@ -93,7 +93,7 @@ public class ManagerTest {
 		assertEquals("should be 0 because no customers and no accounts", 0, boss.getAccount(1, 1).getId());
 		boss.addCustomer("gosho");
 		assertEquals("should be 0 because no customers", 0, boss.getAccount(1, 1).getId());
-		boss.addAccount(1);
+		boss.addPaymentAcc(1);
 		assertEquals("should be 1 because first customer, first account", 1, boss.getAccount(1, 1).getId());
 	}
 	
@@ -104,7 +104,7 @@ public class ManagerTest {
 		assertTrue("should be empty becasue no customers and accounts", boss.getCustomerAccountIds(1).isEmpty());
 		boss.addCustomer("gosho");
 		assertTrue("should be empty because no accounts", boss.getCustomerAccountIds(1).isEmpty());
-		boss.addAccount(1);
+		boss.addPaymentAcc(1);
 		assertEquals("should be 1 because firt customer, only 1 account", 1, boss.getCustomerAccountIds(1).size());
 	}
 }
