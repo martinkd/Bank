@@ -2,10 +2,10 @@ package com.martin.bank.accounts;
 
 public class Account {
 	private int id;
-	double amount;
-	double rate;
-	double interset;
 	String type;
+	private double amount;
+	private double rate;
+	private double interest;
 	private int customerId;
 	
 	public String getType() {
@@ -33,16 +33,24 @@ public class Account {
 	public void setRate(double rate) {
 		this.rate = rate;
 	}
-	public double getInterset() {
-		return interset;
+	public double getInterest() {
+		return interest;
 	}
-	public void setInterset(double interset) {
-		this.interset = interset;
+	public void setInterest(double interest) {
+		this.interest = interest;
 	}
 	public int getCustomerId() {
 		return customerId;
 	}
 	public void setCustomerId(int customerId) {
 		this.customerId = customerId;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Account: %d%n"
+				+ "type: %s%n"
+				+ "amount: %.2f%n"
+				+ "interest: %.2f%n", getId(), getType(), getAmount(), getInterest() );
 	}
 }

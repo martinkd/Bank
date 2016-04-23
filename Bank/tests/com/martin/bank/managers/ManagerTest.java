@@ -1,6 +1,8 @@
 package com.martin.bank.managers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 
@@ -64,5 +66,45 @@ public class ManagerTest {
 		assertFalse("should not remove account if there is no such account", boss.removeAccount(1, 1));
 		boss.addAccount(1);
 		assertTrue("should remove account", boss.removeAccount(1, 1));
+	}
+
+	@Test
+	public void testGetCustomers() throws SQLException {
+		updateData.addManager();
+		Manager boss = query.getBigBoss();
+		assertTrue("should be empty", boss.getCustomers().isEmpty());
+		boss.addCustomer("gosho");
+		assertEquals("should get 1 customer", 1, boss.getCustomers().size());
+	}
+
+	@Test
+	public void testGetCustomer() throws SQLException {
+		updateData.addManager();
+		Manager boss = query.getBigBoss();
+		assertEquals("should be 0 because no such customer", 0, boss.getCustomer(1).getId());
+		boss.addCustomer("gosho");
+		assertEquals("should be 1", 1, boss.getCustomer(1).getId());
+	}
+	
+	@Test
+	public void testGetAccount() throws SQLException {
+		updateData.addManager();
+		Manager boss = query.getBigBoss();
+		assertEquals("should be 0 because no customers and no accounts", 0, boss.getAccount(1, 1).getId());
+		boss.addCustomer("gosho");
+		assertEquals("should be 0 because no customers", 0, boss.getAccount(1, 1).getId());
+		boss.addAccount(1);
+		assertEquals("should be 1 because first customer, first account", 1, boss.getAccount(1, 1).getId());
+	}
+	
+	@Test
+	public void testGetCustomerAccountIds() throws SQLException {
+		updateData.addManager();
+		Manager boss = query.getBigBoss();
+		assertTrue("should be empty becasue no customers and accounts", boss.getCustomerAccountIds(1).isEmpty());
+		boss.addCustomer("gosho");
+		assertTrue("should be empty because no accounts", boss.getCustomerAccountIds(1).isEmpty());
+		boss.addAccount(1);
+		assertEquals("should be 1 because firt customer, only 1 account", 1, boss.getCustomerAccountIds(1).size());
 	}
 }

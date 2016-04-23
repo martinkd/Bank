@@ -1,5 +1,6 @@
 package com.martin.bank.sql;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,6 +15,7 @@ public class DataQuery {
 	private static String user = "student";
 	private static String pass = "student";
 	private Statement myStmt;
+	private PreparedStatement prepSt;
 	private DataAccess accessDataBase = new DataAccess(user, pass);
 	private ResultSet myRs;
 
@@ -39,18 +41,30 @@ public class DataQuery {
 		}
 		return ids.contains(id);
 	}
-	
+
 	public List<Customer> getCustomers() throws SQLException {
 		List<Customer> customers = new ArrayList<Customer>();
 		String sql = "SELECT * FROM customers;";
 		myStmt = accessDataBase.getMyConn().createStatement();
 		myRs = myStmt.executeQuery(sql);
-		while(myRs.next()) {
+		while (myRs.next()) {
 			customers.add(convertRowToCustomer(myRs));
 		}
 		return customers;
 	}
 	
+	public Customer getCustomer(int customerId) throws SQLException {
+		Customer customer = new Customer();
+		String sql = "SELECT * FROM customers WHERE id = ?;";
+		prepSt = accessDataBase.getMyConn().prepareStatement(sql);
+		prepSt.setInt(1, customerId);
+		myRs = prepSt.executeQuery();
+		if (myRs.next()) {
+			customer = convertRowToCustomer(myRs);
+		}
+		return customer;
+	}
+
 	private Customer convertRowToCustomer(ResultSet myRs) throws SQLException {
 		Customer customer = new Customer();
 		int id = myRs.getInt("id");
@@ -61,29 +75,48 @@ public class DataQuery {
 		customer.setManagerId(managerId);
 		return customer;
 	}
-	
-	public List<Account> getAccounts() throws SQLException {
-		List<Account> accounts = new ArrayList<>();
-		String sql = "SELECT * FROM accounts;";
-		myStmt = accessDataBase.getMyConn().createStatement();
-		myRs = myStmt.executeQuery(sql);
-		while(myRs.next()) {
-			accounts.add(convertRowToAccount(myRs));
+
+	public List<Integer> getCustomerAccountIds(int customerId) throws SQLException {
+		List<Integer> accountIds = new ArrayList<Integer>();
+		if (contains(customerId, "customers")) {
+			String sql = "SELECT id FROM accounts WHERE customerId = ?;";
+			prepSt = accessDataBase.getMyConn().prepareStatement(sql);
+			prepSt.setInt(1, customerId);
+			myRs = prepSt.executeQuery();
+			while (myRs.next()) {
+				accountIds.add(myRs.getInt("id"));
+			}
 		}
-		return accounts;
+		return accountIds;
 	}
-	
+
+	public Account getAccount(int customerId, int accountId) throws SQLException {
+		Account account = new Account();
+		if (getCustomerAccountIds(customerId).contains(accountId)) {
+			String sql = "SELECT * FROM accounts WHERE id = ?;";
+			prepSt = accessDataBase.getMyConn().prepareStatement(sql);
+			prepSt.setInt(1, accountId);
+			myRs = prepSt.executeQuery();
+			if (myRs.next()) {
+				return account = convertRowToAccount(myRs);
+			}
+		}
+		return account;
+	}
+
 	private Account convertRowToAccount(ResultSet myRs) throws SQLException {
 		int id = myRs.getInt("id");
-		double amount = myRs.getDouble("amount");
-		double interest = myRs.getDouble("interest");
+		String type = myRs.getString("type");
+		Double amount = myRs.getDouble("amount");
+		Double interest = myRs.getDouble("interest");
 		int customerId = myRs.getInt("customerId");
 		Account account = new Account();
 		account.setId(id);
+		account.setType(type);
 		account.setAmount(amount);
-		account.setInterset(interest);
+		account.setInterest(interest);
 		account.setCustomerId(customerId);
 		return account;
 	}
-	
+
 }

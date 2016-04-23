@@ -1,9 +1,9 @@
 package com.martin.bank.managers;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import com.martin.bank.accounts.Account;
-import com.martin.bank.accounts.Payment;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataQuery;
 import com.martin.bank.sql.DataUpdate;
@@ -43,8 +43,8 @@ public class Manager {
 	public boolean addAccount(int customerId) throws SQLException {
 		boolean canAdd = queryData.contains(customerId, "customers");
 		if (canAdd) {
-			Account paymentAccount = new Payment();
-			updateData.addAccount(paymentAccount, customerId);
+			Account account = new Account();
+			updateData.addAccount(account, customerId);
 		}
 		return canAdd;
 	}
@@ -55,6 +55,22 @@ public class Manager {
 			updateData.removeAccount(accountId);
 		}
 		return canRemove;
+	}
+	
+	public List<Customer> getCustomers () throws SQLException {
+		return queryData.getCustomers();
+	}
+	
+	public Customer getCustomer(int customerId) throws SQLException {
+		return queryData.getCustomer(customerId);
+	}
+	
+	public Account getAccount (int customerId, int accountId) throws SQLException {
+		return queryData.getAccount(customerId, accountId);
+	}
+	
+	public List<Integer> getCustomerAccountIds(int customerId) throws SQLException {
+		return queryData.getCustomerAccountIds(customerId);
 	}
 
 	public int getId() {

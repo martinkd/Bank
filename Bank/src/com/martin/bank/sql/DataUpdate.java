@@ -42,7 +42,7 @@ public class DataUpdate {
 		prepSt = accessDataBase.getMyConn().prepareStatement(sql);
 		prepSt.setString(1, account.getType());
 		prepSt.setDouble(2, account.getAmount());
-		prepSt.setDouble(3, account.getInterset());
+		prepSt.setDouble(3, account.getInterest());
 		prepSt.setInt(4, customerId);
 		prepSt.executeUpdate();
 	}

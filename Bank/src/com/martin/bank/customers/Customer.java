@@ -43,4 +43,9 @@ public class Customer {
 	public void setManagerId(int managerId) {
 		this.managerId = managerId;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("CUSTOMER: %d%n%s%n", getId(), getName());
+	}
 }
