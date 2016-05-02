@@ -9,15 +9,14 @@ public class Customer {
 	private int id;
 	private String name;
 	private int managerId;
-	
-	public static Map<Integer, Account> accounts = new HashMap<Integer, Account>();
+	private Map<Integer, Account> accounts = new HashMap<Integer, Account>();
 	
 	public Map<Integer, Account> getAccounts() {
 		return accounts;
 	}
 
 	public void setAccounts(Map<Integer, Account> accounts) {
-		Customer.accounts = accounts;
+		this.accounts = accounts;
 	}
 	
 	public int getId() {

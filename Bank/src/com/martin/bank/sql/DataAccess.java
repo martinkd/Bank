@@ -19,17 +19,13 @@ public class DataAccess {
 		createTables();
 	}
 
-	public Connection getMyConn() {
-		return myConn;
-	}
-
-	public void setMyConn(Connection myConn) {
-		this.myConn = myConn;
+	public Connection getConnection() throws SQLException {
+		return myConn = DriverManager.getConnection(dbUrl, user, pass);
 	}
 
 	private void createTables() {
 		try {
-			connectDb();
+			createStatement();
 			createManagerTable();
 			createCustomersTable();
 			createAccountsTable();
@@ -38,9 +34,8 @@ public class DataAccess {
 		}
 	}
 
-	private void connectDb() throws SQLException{
-		myConn = DriverManager.getConnection(dbUrl, user, pass);
-		myStmt = myConn.createStatement();
+	private void createStatement() throws SQLException{
+		myStmt = getConnection().createStatement();
 	}
 	
 	private void createManagerTable() throws SQLException{
@@ -74,8 +69,14 @@ public class DataAccess {
 		myStmt.execute(sql);
 	}
 	
+	public void closeConnection() throws SQLException {
+		if (myConn != null) {
+			myConn.close();
+		}
+	}
+	
 	public void deleteAllTables() throws SQLException {
-		connectDb();
+		createStatement();
 		dropAccounts();
 		dropCustomers();
 		dropManager();

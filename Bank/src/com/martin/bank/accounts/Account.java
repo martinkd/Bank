@@ -2,16 +2,16 @@ package com.martin.bank.accounts;
 
 public class Account {
 	private int id;
-	String type;
+	private Type type;
 	private double amount;
 	private double rate;
 	private double interest;
 	private int customerId;
 	
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
-	public void setType(String type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 	

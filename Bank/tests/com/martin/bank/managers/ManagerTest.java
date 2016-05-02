@@ -9,13 +9,15 @@ import java.sql.SQLException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataAccess;
-import com.martin.bank.sql.DataQuery;
-import com.martin.bank.sql.DataUpdate;
 
 public class ManagerTest {
-	DataQuery query = new DataQuery();
-	DataUpdate updateData = new DataUpdate();
+	private static final int INVALID_ID = 0;
+	private static final int FIRST_CUSTOMER_ID = 1;
+	private static final int FIRST_ACCOUNT_ID = 1;
+	private static final int SECOND_ACCOUNT_ID = 2;
+
 
 	@Before
 	public void clearDataBase() throws SQLException {
@@ -25,86 +27,83 @@ public class ManagerTest {
 
 	@Test
 	public void testAddCustomer() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		boss.addCustomer("gosho");
-		assertTrue("first customer id should be 1", query.contains(1, "customers"));
-		boss.addCustomer("misho");
-		assertTrue("second customer id should be 2", query.contains(2, "customers"));
-		assertFalse("third customer should not exists", query.contains(3, "customers"));
-		assertEquals(2, query.getCustomers().size());
+		Manager boss = new Manager("THE BOSS");
+		boss.addCustomer("Gosho");
+		assertEquals("should have only 1 customer", 1, boss.getCustomers().size());
+		boss.addCustomer("Neli");
+		assertEquals("should have 2 customers", 2, boss.getCustomers().size());
+
 	}
 
 	@Test
-	public void testRemoveCustomer() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertFalse("should not remove customer who is not addedd", boss.removeCustomer(1));
+	public void testDeleteCustomer() throws SQLException {
+		Manager boss = new Manager("THE BOSS");
+		assertFalse("should not have any customers to delete", boss.deleteCustomer(1));
 		boss.addCustomer("Gosho");
-		boss.addCustomer("peicho");
-		assertTrue("should remove first customer", boss.removeCustomer(1));
-		assertFalse("should not remove same customer twice", boss.removeCustomer(1));
-		assertEquals(1, query.getCustomers().size());
+		assertTrue("should delete customer with id 1", boss.deleteCustomer(FIRST_CUSTOMER_ID));
+		assertFalse("should not delete same customer twice", boss.deleteCustomer(FIRST_CUSTOMER_ID));
 	}
 
 	@Test
 	public void testAddPaymentAcc() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertFalse("should not add account because no customer for it", boss.addPaymentAcc(1));
-		boss.addCustomer("first customer");
-		assertTrue("should account to first customer", boss.addPaymentAcc(1));
-		assertFalse("should not add account because no customer for it", boss.addPaymentAcc(0));
+		Manager boss = new Manager("THE BOSS");
+		assertFalse("should not add because no customers of the bank", boss.addPaymentAcc(new Customer()));
+		boss.addCustomer("Gosho");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		assertTrue("should be added payment account", boss.addPaymentAcc(gosho));
 	}
-
+	
 	@Test
-	public void testRemovePaymentAcc() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertFalse("should not remove account if there is no such customer", boss.removeAccount(1, 1));
-		boss.addCustomer("firstCustomer");
-		assertFalse("should not remove account if there is no such account", boss.removeAccount(1, 1));
-		boss.addPaymentAcc(1);
-		assertTrue("should remove account", boss.removeAccount(1, 1));
+	public void testDeletePaymentAcc() throws SQLException {
+		Manager boss = new Manager("THE BOSS");
+		assertFalse("should not delete because no accounts of the bank", boss.deleteAccount(FIRST_ACCOUNT_ID));
+		boss.addCustomer("Gosho");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		boss.addPaymentAcc(gosho);
+		assertTrue("should delete account with id 1", boss.deleteAccount(FIRST_ACCOUNT_ID));
+		assertEquals("should be left one account", 1, boss.getCustomerAccounts(FIRST_CUSTOMER_ID).size());
+		assertFalse("should not delete twice same account", boss.deleteAccount(FIRST_ACCOUNT_ID));
+		assertTrue("should delete account with id 2", boss.deleteAccount(SECOND_ACCOUNT_ID));
+		assertTrue("should be empty", boss.getCustomerAccounts(FIRST_CUSTOMER_ID).isEmpty());
 	}
 
 	@Test
 	public void testGetCustomers() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertTrue("should be empty", boss.getCustomers().isEmpty());
-		boss.addCustomer("gosho");
-		assertEquals("should get 1 customer", 1, boss.getCustomers().size());
+		Manager boss = new Manager("THE BOSS");
+		assertTrue("should be empty",boss.getCustomers().isEmpty());
+		boss.addCustomer("Gosho");
+		assertEquals("should have 1 customer", 1, boss.getCustomers().size());
+		boss.addCustomer("Neli");
+		assertEquals("should have 2 customers", 2, boss.getCustomers().size());
+
 	}
 
 	@Test
 	public void testGetCustomer() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertEquals("should be 0 because no such customer", 0, boss.getCustomer(1).getId());
-		boss.addCustomer("gosho");
-		assertEquals("should be 1", 1, boss.getCustomer(1).getId());
+		Manager boss = new Manager("THE BOSS");
+		assertEquals("should not have any customers to get",
+				INVALID_ID, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
+		boss.addCustomer("Gosho");
+		assertEquals("first customer id should be 1", 1, 
+				boss.getCustomer(FIRST_CUSTOMER_ID).getId());
+		assertEquals("first customer name should be Gosho", "Gosho", 
+				boss.getCustomer(FIRST_CUSTOMER_ID).getName());
+
 	}
 	
 	@Test
 	public void testGetAccount() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertEquals("should be 0 because no customers and no accounts", 0, boss.getAccount(1, 1).getId());
-		boss.addCustomer("gosho");
-		assertEquals("should be 0 because no customers", 0, boss.getAccount(1, 1).getId());
-		boss.addPaymentAcc(1);
-		assertEquals("should be 1 because first customer, first account", 1, boss.getAccount(1, 1).getId());
+		Manager boss = new Manager("THE BOSS");
+		assertEquals("shoud not have any accounts to get", 
+				INVALID_ID, boss.getAccount(FIRST_ACCOUNT_ID).getId());
+		boss.addCustomer("Gosho");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		boss.addPaymentAcc(gosho);
+		assertEquals("should get first account", 1, boss.getAccount(FIRST_ACCOUNT_ID).getId());
+		assertEquals("should get second account", 2, boss.getAccount(SECOND_ACCOUNT_ID).getId());
+
 	}
 	
-	@Test
-	public void testGetCustomerAccountIds() throws SQLException {
-		updateData.addManager();
-		Manager boss = query.getBigBoss();
-		assertTrue("should be empty becasue no customers and accounts", boss.getCustomerAccountIds(1).isEmpty());
-		boss.addCustomer("gosho");
-		assertTrue("should be empty because no accounts", boss.getCustomerAccountIds(1).isEmpty());
-		boss.addPaymentAcc(1);
-		assertEquals("should be 1 because firt customer, only 1 account", 1, boss.getCustomerAccountIds(1).size());
-	}
 }

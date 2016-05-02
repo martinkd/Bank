@@ -8,93 +8,93 @@ import com.martin.bank.accounts.Credit;
 import com.martin.bank.accounts.Payment;
 import com.martin.bank.accounts.Savings;
 import com.martin.bank.customers.Customer;
-import com.martin.bank.sql.DataQuery;
-import com.martin.bank.sql.DataUpdate;
+import com.martin.bank.sql.AccountDao;
+import com.martin.bank.sql.CustomerDao;
+import com.martin.bank.sql.ManagerDao;
 
 public class Manager {
 	private int id;
 	private String name;
-	private Customer customer;
-	private DataUpdate updateData = new DataUpdate();
-	private DataQuery queryData = new DataQuery();
+	private ManagerDao mDao;
+	private CustomerDao cDao;
+	private AccountDao aDao;
+	private static final int INVALID_ID = 0;
 
 	public Manager() {};
 
-	public Manager(String name) {
+	public Manager(String name) throws SQLException {
 		this.name = name;
+		mDao = new ManagerDao();
+		cDao = new CustomerDao();
+		aDao = new AccountDao();
+		Manager manager = new Manager();
+		manager.setName(name);
+		mDao.add(manager);
 	}
 
 	private Manager bigBoss() throws SQLException {
-		return queryData.getBigBoss();
+		return mDao.getBigBoss();
 	}
 
 	public Customer addCustomer(String name) throws SQLException {
-		customer = new Customer();
+		Customer customer = new Customer();
 		customer.setName(name);
-		updateData.addCustomer(customer, bigBoss());
+		customer.setManagerId(bigBoss().getId());
+		cDao.add(customer);
 		return customer;
 	}
 
-	public boolean removeCustomer(int customerId) throws SQLException {
-		boolean canRemove = queryData.contains(customerId, "customers");
-		if (canRemove) {
-			updateData.removeCustomer(customerId);
+	public boolean deleteCustomer(int customerId) throws SQLException {
+		boolean canDelete = cDao.findById(customerId).getId() != INVALID_ID;
+		if (canDelete) {
+			cDao.delete(customerId);
 		}
-		return canRemove;
+		return canDelete;
 	}
-
-	/*public boolean addAccount(int customerId) throws SQLException {
-		boolean canAdd = queryData.contains(customerId, "customers");
+	
+	public boolean addPaymentAcc(Customer customer) throws SQLException {
+		return addAccountIfCan(customer, new Payment());
+	}
+	
+	public boolean addCreditAcc(Customer customer) throws SQLException {
+		return addAccountIfCan(customer, new Credit());
+	}
+	
+	public boolean addSavingsAcc(Customer customer) throws SQLException {
+		return addAccountIfCan(customer, new Savings());
+	}
+	
+	private boolean addAccountIfCan(Customer customer, Account account) throws SQLException {
+		boolean canAdd = cDao.findById(customer.getId()).getId() != INVALID_ID;
 		if (canAdd) {
-			Account account = new Payment();
-			updateData.addAccount(account, customerId);
-		}
-		return canAdd;
-	}
-	*/
-	
-	public boolean addPaymentAcc(int customerId) throws SQLException {
-		return addAccountIfCan(customerId, new Payment());
-	}
-	
-	public boolean addCreditAcc(int customerId) throws SQLException {
-		return addAccountIfCan(customerId, new Credit());
-	}
-	
-	public boolean addSavingsAcc(int customerId) throws SQLException {
-		return addAccountIfCan(customerId, new Savings());
-	}
-	
-	private boolean addAccountIfCan(int customerId, Account account) throws SQLException {
-		boolean canAdd = queryData.contains(customerId, "customers");
-		if (canAdd) {
-			updateData.addAccount(account, customerId);
+			account.setCustomerId(customer.getId());
+			aDao.add(account);
 		}
 		return canAdd;
 	}
 
-	public boolean removeAccount(int customerId, int accountId) throws SQLException {
-		boolean canRemove = queryData.contains(customerId, "customers") && queryData.contains(accountId, "accounts");
-		if (canRemove) {
-			updateData.removeAccount(accountId);
+	public boolean deleteAccount(int accountId) throws SQLException {
+		boolean canDelete = aDao.findById(accountId).getId() != INVALID_ID;
+		if (canDelete) {
+			aDao.delete(accountId);
 		}
-		return canRemove;
+		return canDelete;
 	}
 	
 	public List<Customer> getCustomers () throws SQLException {
-		return queryData.getCustomers();
+		return cDao.findAll();
 	}
 	
-	public Customer getCustomer(int customerId) throws SQLException {
-		return queryData.getCustomer(customerId);
+	public Customer getCustomer(int id) throws SQLException {
+		return cDao.findById(id);
 	}
 	
-	public Account getAccount (int customerId, int accountId) throws SQLException {
-		return queryData.getAccount(customerId, accountId);
+	public Account getAccount (int accountId) throws SQLException {
+		return aDao.findById(accountId);
 	}
 	
-	public List<Integer> getCustomerAccountIds(int customerId) throws SQLException {
-		return queryData.getCustomerAccountIds(customerId);
+	public List<Account> getCustomerAccounts(int customerId) throws SQLException {
+		return aDao.findAllCustomerAccounts(customerId);
 	}
 
 	public int getId() {
