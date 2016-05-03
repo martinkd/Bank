@@ -11,23 +11,29 @@ import org.junit.Test;
 
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataAccess;
+import com.martin.bank.sql.ManagerDao;
 
 public class ManagerTest {
 	private static final int INVALID_ID = 0;
 	private static final int FIRST_CUSTOMER_ID = 1;
+	private static final int SECOND_CUSTOMER_ID = 2;
 	private static final int FIRST_ACCOUNT_ID = 1;
 	private static final int SECOND_ACCOUNT_ID = 2;
-
+	private Manager boss;
+	private ManagerDao mDao;
 
 	@Before
 	public void clearDataBase() throws SQLException {
 		DataAccess da = new DataAccess("student", "student");
 		da.deleteAllTables();
+		boss = new Manager("BOSS");
+		mDao = new ManagerDao();
+		mDao.add(boss);
 	}
 
 	@Test
 	public void testAddCustomer() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		boss.addCustomer("Gosho");
 		assertEquals("should have only 1 customer", 1, boss.getCustomers().size());
 		boss.addCustomer("Neli");
@@ -37,7 +43,7 @@ public class ManagerTest {
 
 	@Test
 	public void testDeleteCustomer() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertFalse("should not have any customers to delete", boss.deleteCustomer(1));
 		boss.addCustomer("Gosho");
 		assertTrue("should delete customer with id 1", boss.deleteCustomer(FIRST_CUSTOMER_ID));
@@ -46,7 +52,7 @@ public class ManagerTest {
 
 	@Test
 	public void testAddPaymentAcc() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertFalse("should not add because no customers of the bank", boss.addPaymentAcc(new Customer()));
 		boss.addCustomer("Gosho");
 		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
@@ -55,7 +61,7 @@ public class ManagerTest {
 	
 	@Test
 	public void testDeletePaymentAcc() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertFalse("should not delete because no accounts of the bank", boss.deleteAccount(FIRST_ACCOUNT_ID));
 		boss.addCustomer("Gosho");
 		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
@@ -70,7 +76,7 @@ public class ManagerTest {
 
 	@Test
 	public void testGetCustomers() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertTrue("should be empty",boss.getCustomers().isEmpty());
 		boss.addCustomer("Gosho");
 		assertEquals("should have 1 customer", 1, boss.getCustomers().size());
@@ -81,7 +87,7 @@ public class ManagerTest {
 
 	@Test
 	public void testGetCustomer() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertEquals("should not have any customers to get",
 				INVALID_ID, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
 		boss.addCustomer("Gosho");
@@ -94,7 +100,7 @@ public class ManagerTest {
 	
 	@Test
 	public void testGetAccount() throws SQLException {
-		Manager boss = new Manager("THE BOSS");
+		boss = mDao.getBigBoss();
 		assertEquals("shoud not have any accounts to get", 
 				INVALID_ID, boss.getAccount(FIRST_ACCOUNT_ID).getId());
 		boss.addCustomer("Gosho");
@@ -103,6 +109,21 @@ public class ManagerTest {
 		boss.addPaymentAcc(gosho);
 		assertEquals("should get first account", 1, boss.getAccount(FIRST_ACCOUNT_ID).getId());
 		assertEquals("should get second account", 2, boss.getAccount(SECOND_ACCOUNT_ID).getId());
+
+	}
+	
+	@Test
+	public void testGetCustomerAccounts() throws SQLException {
+		boss = mDao.getBigBoss();
+		boss.addCustomer("Gosho");
+		boss.addCustomer("Martin");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		Customer martin = boss.getCustomer(SECOND_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		boss.addCreditAcc(gosho);
+		boss.addSavingsAcc(martin);
+		assertEquals("Gosho should have 2 accounts",2, boss.getCustomerAccounts(gosho.getId()).size());
+		assertEquals("Martin should have 1 account",1, boss.getCustomerAccounts(martin.getId()).size());
 
 	}
 	

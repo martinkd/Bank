@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.managers.Manager;
 import com.martin.bank.sql.DataAccess;
+import com.martin.bank.sql.ManagerDao;
 
 
 public class BankMenu {
@@ -12,17 +13,18 @@ public class BankMenu {
 	public static void main(String[] args) throws SQLException {
 		DataAccess da = new DataAccess("student", "student");
 		da.deleteAllTables();
+		ManagerDao mDao = new ManagerDao();
 		Manager manager = new Manager("THE BOSS");
+		mDao.add(manager);
+		manager = mDao.getBigBoss();
 		manager.addCustomer("gosho");
 		manager.addCustomer("martin");
+		
 		for (Customer customer : manager.getCustomers()) {
 			System.out.println(customer);
 		}
 		Customer gosho = manager.getCustomer(1);
-		System.out.println(gosho);
-		
 		Customer martin = manager.getCustomer(2);
-		System.out.println(martin);
 		
 		manager.addPaymentAcc(gosho);
 		manager.addCreditAcc(gosho);
