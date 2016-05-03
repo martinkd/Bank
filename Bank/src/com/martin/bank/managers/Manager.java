@@ -105,6 +105,12 @@ public class Manager {
 		}
 		return isEnoughBalance;
 	}
+	
+	public void transfer(Account sender, Account reciever, double amount) throws SQLException {
+		if (pull(sender, amount)) {
+			charge(reciever, amount);
+		}
+	}
 
 	public int getId() {
 		return id;

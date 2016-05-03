@@ -150,5 +150,31 @@ public class ManagerTest {
 		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
 		assertEquals("should be left 50", 50, goshoAccount.getAmount(), 0.01);
 	}
+	
+	@Test
+	public void testTransfer () throws SQLException {
+		boss = mDao.getBigBoss();
+		boss.addCustomer("Gosho");
+		boss.addCustomer("Martin");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		Customer martin = boss.getCustomer(SECOND_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		boss.addPaymentAcc(martin);
+		
+		Account goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		boss.charge(goshoAccount, 100);
+		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		Account martinAccount = boss.getAccount(SECOND_ACCOUNT_ID);
+		boss.transfer(goshoAccount, martinAccount, 150);
+		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		assertEquals("transfer should not pass because not enough balance",
+				100, goshoAccount.getAmount(), 0.01);
+		
+		boss.transfer(goshoAccount, martinAccount, 50);
+		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		martinAccount = boss.getAccount(SECOND_ACCOUNT_ID);
+		assertEquals("Gosho and Martin should have 50", 50, goshoAccount.getAmount(), 0.01);
+		assertEquals("Gosho and Martin should have 50", 50, martinAccount.getAmount(), 0.01);
 
+	}
 }
