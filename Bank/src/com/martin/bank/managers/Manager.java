@@ -86,6 +86,26 @@ public class Manager {
 		return aDao.findAllCustomerAccounts(customerId);
 	}
 
+	public void charge(Account account, double cashFlow) throws SQLException {
+		Account currentAccount = aDao.findById(account.getId());
+		double amount = currentAccount.getAmount();
+		amount += cashFlow;
+		currentAccount.setAmount(amount);
+		aDao.update(account, currentAccount);
+	}
+
+	public boolean pull(Account account, double cashFlow) throws SQLException {
+		Account currentAccount = aDao.findById(account.getId());
+		double amount = currentAccount.getAmount();
+		boolean isEnoughBalance = cashFlow <= amount;
+		if (isEnoughBalance) {
+			amount -= cashFlow;
+			currentAccount.setAmount(amount);
+			aDao.update(account, currentAccount);
+		}
+		return isEnoughBalance;
+	}
+
 	public int getId() {
 		return id;
 	}

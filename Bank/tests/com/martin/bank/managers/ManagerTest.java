@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.martin.bank.accounts.Account;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataAccess;
 import com.martin.bank.sql.ManagerDao;
@@ -58,7 +59,7 @@ public class ManagerTest {
 		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
 		assertTrue("should be added payment account", boss.addPaymentAcc(gosho));
 	}
-	
+
 	@Test
 	public void testDeletePaymentAcc() throws SQLException {
 		boss = mDao.getBigBoss();
@@ -77,7 +78,7 @@ public class ManagerTest {
 	@Test
 	public void testGetCustomers() throws SQLException {
 		boss = mDao.getBigBoss();
-		assertTrue("should be empty",boss.getCustomers().isEmpty());
+		assertTrue("should be empty", boss.getCustomers().isEmpty());
 		boss.addCustomer("Gosho");
 		assertEquals("should have 1 customer", 1, boss.getCustomers().size());
 		boss.addCustomer("Neli");
@@ -88,21 +89,17 @@ public class ManagerTest {
 	@Test
 	public void testGetCustomer() throws SQLException {
 		boss = mDao.getBigBoss();
-		assertEquals("should not have any customers to get",
-				INVALID_ID, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
+		assertEquals("should not have any customers to get", INVALID_ID, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
 		boss.addCustomer("Gosho");
-		assertEquals("first customer id should be 1", 1, 
-				boss.getCustomer(FIRST_CUSTOMER_ID).getId());
-		assertEquals("first customer name should be Gosho", "Gosho", 
-				boss.getCustomer(FIRST_CUSTOMER_ID).getName());
+		assertEquals("first customer id should be 1", 1, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
+		assertEquals("first customer name should be Gosho", "Gosho", boss.getCustomer(FIRST_CUSTOMER_ID).getName());
 
 	}
-	
+
 	@Test
 	public void testGetAccount() throws SQLException {
 		boss = mDao.getBigBoss();
-		assertEquals("shoud not have any accounts to get", 
-				INVALID_ID, boss.getAccount(FIRST_ACCOUNT_ID).getId());
+		assertEquals("shoud not have any accounts to get", INVALID_ID, boss.getAccount(FIRST_ACCOUNT_ID).getId());
 		boss.addCustomer("Gosho");
 		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
 		boss.addPaymentAcc(gosho);
@@ -111,7 +108,7 @@ public class ManagerTest {
 		assertEquals("should get second account", 2, boss.getAccount(SECOND_ACCOUNT_ID).getId());
 
 	}
-	
+
 	@Test
 	public void testGetCustomerAccounts() throws SQLException {
 		boss = mDao.getBigBoss();
@@ -122,9 +119,36 @@ public class ManagerTest {
 		boss.addPaymentAcc(gosho);
 		boss.addCreditAcc(gosho);
 		boss.addSavingsAcc(martin);
-		assertEquals("Gosho should have 2 accounts",2, boss.getCustomerAccounts(gosho.getId()).size());
-		assertEquals("Martin should have 1 account",1, boss.getCustomerAccounts(martin.getId()).size());
+		assertEquals("Gosho should have 2 accounts", 2, boss.getCustomerAccounts(gosho.getId()).size());
+		assertEquals("Martin should have 1 account", 1, boss.getCustomerAccounts(martin.getId()).size());
 
 	}
-	
+
+	@Test
+	public void testCharge() throws SQLException {
+		boss = mDao.getBigBoss();
+		boss.addCustomer("Gosho");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		Account goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		assertEquals("shoul be 0", 0, goshoAccount.getAmount(), 0.01);
+		boss.charge(goshoAccount, 100);
+		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		assertEquals("should be 100", 100, goshoAccount.getAmount(), 0.01);
+	}
+
+	@Test
+	public void testPull() throws SQLException {
+		boss = mDao.getBigBoss();
+		boss.addCustomer("Gosho");
+		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
+		boss.addPaymentAcc(gosho);
+		Account goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		assertFalse("should not have money to pull", boss.pull(goshoAccount, 100));
+		boss.charge(goshoAccount, 150);
+		assertTrue("should pull OK", boss.pull(goshoAccount, 100));
+		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
+		assertEquals("should be left 50", 50, goshoAccount.getAmount(), 0.01);
+	}
+
 }

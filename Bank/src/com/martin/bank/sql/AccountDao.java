@@ -96,7 +96,7 @@ public class AccountDao {
 
 	public void update(Account account, Account newAccount) throws SQLException {
 		try {
-			String sql = "UPDATE accounts SET amount = ?, SET interest = ?  WHERE id = ?;";
+			String sql = "UPDATE accounts SET amount = ?, interest = ?  WHERE id = ?;";
 			prepSt = accessDataBase.getConnection().prepareStatement(sql);
 			prepSt.setDouble(1, newAccount.getAmount());
 			prepSt.setDouble(2, newAccount.getInterest());
