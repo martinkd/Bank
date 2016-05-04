@@ -32,20 +32,20 @@ public class BankMenu {
 		manager.addCreditAcc(gosho, Rate.CREDIT_12_MONTHS);
 		manager.addSavingsAcc(gosho, Rate.SAVINGS_12_MONTHS);
 		
-		System.out.println(manager.getAccount(1));
-		System.out.println(manager.getAccount(2));
-		System.out.println(manager.getAccount(3));
-		
 		manager.addPaymentAcc(martin);
 		
-		System.out.println(manager.getAccount(4));
-		System.out.println(manager.getAccount(5));
+		Account goshoPaymAcc = manager.getAccount(1);
+		manager.charge(goshoPaymAcc, 5000);
 		Account goshoCreditAcc = manager.getAccount(2);
 		manager.charge(goshoCreditAcc, 100);
 		Account goshoSavingsAcc = manager.getAccount(3);
-		manager.charge(goshoSavingsAcc, 100);
-		System.out.println(manager.getCustomerAccounts(martin.getId()));
+		manager.charge(goshoSavingsAcc, 50);
+
+		Account martinPaymAcc = manager.getAccount(4);
+		manager.charge(martinPaymAcc, 2000);
+		
 		System.out.println(manager.getCustomerAccounts(gosho.getId()));
+		System.out.println(manager.getCustomerAccounts(martin.getId()));
 
 	}
 }

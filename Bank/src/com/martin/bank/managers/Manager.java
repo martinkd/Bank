@@ -105,6 +105,8 @@ public class Manager {
 	
 	private double calculateInterest(double amount, double rate) {
 		double interest = amount * rate;
+		interest = Math.round(interest * 100);
+		interest = interest/100;
 		return interest;
 	}
 

@@ -1,7 +1,7 @@
 package com.martin.bank.accounts;
 
 public enum Rate {
-	CREDIT_12_MONTHS(0.1), SAVINGS_12_MONTHS(0.07);
+	PAYMENT_12_MONTHS(0.0001), CREDIT_12_MONTHS(0.1), SAVINGS_12_MONTHS(0.07);
 
 	private double rate;
 
