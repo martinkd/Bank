@@ -62,6 +62,7 @@ public class DataAccess {
 				+ "id INT NOT NULL AUTO_INCREMENT,"
 				+ "type VARCHAR(45),"
 				+ "amount DOUBLE,"
+				+ "rate DOUBLE,"
 				+ "interest DOUBLE,"
 				+ "customerId INT,"
 				+ "PRIMARY KEY(id)"

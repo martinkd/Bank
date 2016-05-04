@@ -6,6 +6,7 @@ import java.util.List;
 import com.martin.bank.accounts.Account;
 import com.martin.bank.accounts.Credit;
 import com.martin.bank.accounts.Payment;
+import com.martin.bank.accounts.Rate;
 import com.martin.bank.accounts.Savings;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.AccountDao;
@@ -45,18 +46,23 @@ public class Manager {
 		return addAccountIfCan(customer, new Payment());
 	}
 
-	public boolean addCreditAcc(Customer customer) throws SQLException {
-		return addAccountIfCan(customer, new Credit());
+	public boolean addCreditAcc(Customer customer, Rate rate) throws SQLException {
+		Credit credit = new Credit();
+		credit.setRate(rate.getRate());
+		return addAccountIfCan(customer, credit);
 	}
 
-	public boolean addSavingsAcc(Customer customer) throws SQLException {
-		return addAccountIfCan(customer, new Savings());
+	public boolean addSavingsAcc(Customer customer, Rate rate) throws SQLException {
+		Savings savings = new Savings();
+		savings.setRate(rate.getRate());
+		return addAccountIfCan(customer, savings);
 	}
 
 	private boolean addAccountIfCan(Customer customer, Account account) throws SQLException {
 		boolean canAdd = cDao.findById(customer.getId()).getId() != INVALID_ID;
 		if (canAdd) {
 			account.setCustomerId(customer.getId());
+			account.setRate(account.getRate());
 			aDao.add(account);
 		}
 		return canAdd;
@@ -89,9 +95,17 @@ public class Manager {
 	public void charge(Account account, double cashFlow) throws SQLException {
 		Account currentAccount = aDao.findById(account.getId());
 		double amount = currentAccount.getAmount();
+		double rate = currentAccount.getRate();
 		amount += cashFlow;
+		double interest = calculateInterest(amount, rate);
 		currentAccount.setAmount(amount);
+		currentAccount.setInterest(interest);
 		aDao.update(account, currentAccount);
+	}
+	
+	private double calculateInterest(double amount, double rate) {
+		double interest = amount * rate;
+		return interest;
 	}
 
 	public boolean pull(Account account, double cashFlow) throws SQLException {

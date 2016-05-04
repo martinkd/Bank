@@ -57,6 +57,7 @@ public class AccountDao {
 		Account account = new Account();
 		account.setId(myRs.getInt("id"));
 		account.setType(Type.valueOf(myRs.getString("type")));
+		account.setRate(myRs.getDouble("rate"));
 		account.setAmount(myRs.getDouble("amount"));
 		account.setInterest(myRs.getDouble("interest"));
 		account.setCustomerId(myRs.getInt("customerId"));
@@ -81,13 +82,14 @@ public class AccountDao {
 
 	public void add(Account account) throws SQLException {
 		try {
-			String sql = "INSERT INTO accounts (type, amount, interest, customerId)" 
-					+ " VALUES (?, ?, ?, ?);";
+			String sql = "INSERT INTO accounts (type, amount, rate, interest, customerId)" 
+					+ " VALUES (?, ?, ?, ?, ?);";
 			prepSt = accessDataBase.getConnection().prepareStatement(sql);
 			prepSt.setString(1, account.getType().toString());
 			prepSt.setDouble(2, account.getAmount());
-			prepSt.setDouble(3, account.getInterest());
-			prepSt.setInt(4, account.getCustomerId());
+			prepSt.setDouble(3, account.getRate());
+			prepSt.setDouble(4, account.getInterest());
+			prepSt.setInt(5, account.getCustomerId());
 			prepSt.executeUpdate();
 		} finally {
 			accessDataBase.closeConnection();

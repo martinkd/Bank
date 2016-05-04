@@ -2,6 +2,8 @@ package com.martin.bank.menu;
 
 import java.sql.SQLException;
 
+import com.martin.bank.accounts.Account;
+import com.martin.bank.accounts.Rate;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.managers.Manager;
 import com.martin.bank.sql.DataAccess;
@@ -27,8 +29,8 @@ public class BankMenu {
 		Customer martin = manager.getCustomer(2);
 		
 		manager.addPaymentAcc(gosho);
-		manager.addCreditAcc(gosho);
-		manager.addSavingsAcc(gosho);
+		manager.addCreditAcc(gosho, Rate.CREDIT_12_MONTHS);
+		manager.addSavingsAcc(gosho, Rate.SAVINGS_12_MONTHS);
 		
 		System.out.println(manager.getAccount(1));
 		System.out.println(manager.getAccount(2));
@@ -38,10 +40,12 @@ public class BankMenu {
 		
 		System.out.println(manager.getAccount(4));
 		System.out.println(manager.getAccount(5));
-		
+		Account goshoCreditAcc = manager.getAccount(2);
+		manager.charge(goshoCreditAcc, 100);
+		Account goshoSavingsAcc = manager.getAccount(3);
+		manager.charge(goshoSavingsAcc, 100);
 		System.out.println(manager.getCustomerAccounts(martin.getId()));
 		System.out.println(manager.getCustomerAccounts(gosho.getId()));
-
 
 	}
 }

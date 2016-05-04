@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.martin.bank.accounts.Account;
+import com.martin.bank.accounts.Rate;
 import com.martin.bank.customers.Customer;
 import com.martin.bank.sql.DataAccess;
 import com.martin.bank.sql.ManagerDao;
@@ -117,8 +118,8 @@ public class ManagerTest {
 		Customer gosho = boss.getCustomer(FIRST_CUSTOMER_ID);
 		Customer martin = boss.getCustomer(SECOND_CUSTOMER_ID);
 		boss.addPaymentAcc(gosho);
-		boss.addCreditAcc(gosho);
-		boss.addSavingsAcc(martin);
+		boss.addCreditAcc(gosho, Rate.CREDIT_12_MONTHS);
+		boss.addSavingsAcc(martin, Rate.SAVINGS_12_MONTHS);
 		assertEquals("Gosho should have 2 accounts", 2, boss.getCustomerAccounts(gosho.getId()).size());
 		assertEquals("Martin should have 1 account", 1, boss.getCustomerAccounts(martin.getId()).size());
 
