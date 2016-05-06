@@ -2,6 +2,7 @@ package com.martin.bank.managers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
@@ -70,10 +71,10 @@ public class ManagerTest {
 		boss.addPaymentAcc(gosho);
 		boss.addPaymentAcc(gosho);
 		assertTrue("should delete account with id 1", boss.deleteAccount(FIRST_ACCOUNT_ID));
-		assertEquals("should be left one account", 1, boss.getCustomerAccounts(FIRST_CUSTOMER_ID).size());
+		assertEquals("should be left one account", 1, boss.getCustomerAccounts(gosho).size());
 		assertFalse("should not delete twice same account", boss.deleteAccount(FIRST_ACCOUNT_ID));
 		assertTrue("should delete account with id 2", boss.deleteAccount(SECOND_ACCOUNT_ID));
-		assertTrue("should be empty", boss.getCustomerAccounts(FIRST_CUSTOMER_ID).isEmpty());
+		assertTrue("should be empty", boss.getCustomerAccounts(gosho).isEmpty());
 	}
 
 	@Test
@@ -90,7 +91,7 @@ public class ManagerTest {
 	@Test
 	public void testGetCustomer() throws SQLException {
 		boss = mDao.getBigBoss();
-		assertEquals("should not have any customers to get", INVALID_ID, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
+		assertNull("should not have any customers to get", boss.getCustomer(FIRST_CUSTOMER_ID));
 		boss.addCustomer("Gosho");
 		assertEquals("first customer id should be 1", 1, boss.getCustomer(FIRST_CUSTOMER_ID).getId());
 		assertEquals("first customer name should be Gosho", "Gosho", boss.getCustomer(FIRST_CUSTOMER_ID).getName());
@@ -120,8 +121,8 @@ public class ManagerTest {
 		boss.addPaymentAcc(gosho);
 		boss.addCreditAcc(gosho, Rate.CREDIT_12_MONTHS);
 		boss.addSavingsAcc(martin, Rate.SAVINGS_12_MONTHS);
-		assertEquals("Gosho should have 2 accounts", 2, boss.getCustomerAccounts(gosho.getId()).size());
-		assertEquals("Martin should have 1 account", 1, boss.getCustomerAccounts(martin.getId()).size());
+		assertEquals("Gosho should have 2 accounts", 2, boss.getCustomerAccounts(gosho).size());
+		assertEquals("Martin should have 1 account", 1, boss.getCustomerAccounts(martin).size());
 
 	}
 
@@ -151,9 +152,9 @@ public class ManagerTest {
 		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
 		assertEquals("should be left 50", 50, goshoAccount.getAmount(), 0.01);
 	}
-	
+
 	@Test
-	public void testTransfer () throws SQLException {
+	public void testTransfer() throws SQLException {
 		boss = mDao.getBigBoss();
 		boss.addCustomer("Gosho");
 		boss.addCustomer("Martin");
@@ -161,16 +162,15 @@ public class ManagerTest {
 		Customer martin = boss.getCustomer(SECOND_CUSTOMER_ID);
 		boss.addPaymentAcc(gosho);
 		boss.addPaymentAcc(martin);
-		
+
 		Account goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
 		boss.charge(goshoAccount, 100);
 		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
 		Account martinAccount = boss.getAccount(SECOND_ACCOUNT_ID);
 		boss.transfer(goshoAccount, martinAccount, 150);
 		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
-		assertEquals("transfer should not pass because not enough balance",
-				100, goshoAccount.getAmount(), 0.01);
-		
+		assertEquals("transfer should not pass because not enough balance", 100, goshoAccount.getAmount(), 0.01);
+
 		boss.transfer(goshoAccount, martinAccount, 50);
 		goshoAccount = boss.getAccount(FIRST_ACCOUNT_ID);
 		martinAccount = boss.getAccount(SECOND_ACCOUNT_ID);

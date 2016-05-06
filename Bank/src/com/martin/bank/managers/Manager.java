@@ -35,7 +35,7 @@ public class Manager {
 	}
 
 	public boolean deleteCustomer(int customerId) throws SQLException {
-		boolean canDelete = cDao.findById(customerId).getId() != INVALID_ID;
+		boolean canDelete = cDao.findById(customerId) != null;
 		if (canDelete) {
 			cDao.delete(customerId);
 		}
@@ -59,7 +59,7 @@ public class Manager {
 	}
 
 	private boolean addAccountIfCan(Customer customer, Account account) throws SQLException {
-		boolean canAdd = cDao.findById(customer.getId()).getId() != INVALID_ID;
+		boolean canAdd = cDao.findById(customer.getId()) != null;
 		if (canAdd) {
 			account.setCustomerId(customer.getId());
 			account.setRate(account.getRate());
@@ -87,9 +87,13 @@ public class Manager {
 	public Account getAccount(int accountId) throws SQLException {
 		return aDao.findById(accountId);
 	}
+	
+	public List<Account> getAllAccounts() throws SQLException {
+		return aDao.findAll();
+	}
 
-	public List<Account> getCustomerAccounts(int customerId) throws SQLException {
-		return aDao.findAllCustomerAccounts(customerId);
+	public List<Account> getCustomerAccounts(Customer customer) throws SQLException {
+		return aDao.findAllCustomerAccounts(customer);
 	}
 
 	public void charge(Account account, double cashFlow) throws SQLException {

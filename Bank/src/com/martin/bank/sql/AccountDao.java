@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.martin.bank.accounts.Account;
 import com.martin.bank.accounts.Type;
+import com.martin.bank.customers.Customer;
 
 public class AccountDao {
 	private static String user = "student";
@@ -37,12 +38,12 @@ public class AccountDao {
 		}
 	}
 	
-	public List<Account> findAllCustomerAccounts(int customerId) throws SQLException {
+	public List<Account> findAllCustomerAccounts(Customer customer) throws SQLException {
 		List<Account> accounts = new ArrayList<Account>();
 		try {
 			String sql = "SELECT * FROM accounts WHERE customerId = ?;";
 			prepSt = accessDataBase.getConnection().prepareStatement(sql);
-			prepSt.setInt(1, customerId);
+			prepSt.setInt(1, customer.getId());
 			myRs = prepSt.executeQuery();
 			while (myRs.next()) {
 				accounts.add(convertRowToAccount(myRs));

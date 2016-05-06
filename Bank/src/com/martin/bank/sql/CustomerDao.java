@@ -20,7 +20,7 @@ public class CustomerDao {
 	public CustomerDao() {
 		accessDataBase = new DataAccess(user, pass);
 	}
-	
+
 	public List<Customer> findAll() throws SQLException {
 		List<Customer> customers = new ArrayList<Customer>();
 		try {
@@ -45,7 +45,7 @@ public class CustomerDao {
 	}
 
 	public Customer findById(int id) throws SQLException {
-		Customer customer = new Customer();
+		Customer customer = null;
 		try {
 			String sql = "SELECT * FROM customers WHERE id = ?;";
 			prepSt = accessDataBase.getConnection().prepareStatement(sql);
