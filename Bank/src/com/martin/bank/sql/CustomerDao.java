@@ -74,7 +74,7 @@ public class CustomerDao {
 
 	public void update(Customer customer, Customer newCustomer) throws SQLException {
 		try {
-			String sql = "UPDATE customer SET name = ?, managerId = ? WHERE id = ?;";
+			String sql = "UPDATE customers SET name = ?, managerId = ? WHERE id = ?;";
 			prepSt = accessDataBase.getConnection().prepareStatement(sql);
 			prepSt.setString(1, newCustomer.getName());
 			prepSt.setInt(2, newCustomer.getManagerId());

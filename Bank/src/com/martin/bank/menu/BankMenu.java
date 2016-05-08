@@ -28,6 +28,15 @@ public class BankMenu {
 	private static final int GET_ALL_ACCOUNTS = 3;
 	private static final int GET_CUSTOMER_ACCOUNTS = 4;
 	private static final int FIND_ACCOUNT_BY_ID = 5;
+	private static final int UPDATE_CUSTOMER = 1;
+	private static final int UPDATE_NAME = 1;
+	private static final int UPDATE_MANAGER = 2;
+	private static final int UPDATE_ACCOUNT = 2;
+	private static final int CHARGE = 1;
+	private static final int PULL = 2;
+	private static final int TRANSFER = 3;
+	private static final int DELETE_CUSTOMER = 1;
+	private static final int DELETE_ACCOUNT = 2;
 	private static final int RETURN = 0;
 	private static Scanner input = new Scanner(System.in);
 	private ManagerDao mDao = new ManagerDao();
@@ -65,8 +74,10 @@ public class BankMenu {
 			addMenu(manager);
 			break;
 		case DELETE:
+			deleteMenu(manager);
 			break;
 		case UPDATE:
+			updateMenu(manager);
 			break;
 		case RETURN:
 			logIn();
@@ -224,4 +235,188 @@ public class BankMenu {
 		}
 	}
 
+	private void updateMenu(Manager manager) throws SQLException {
+		String command = "1. Update customer\n2. Update account\n0. RETURN";
+		System.out.println(command);
+		int option = BankUtils.getValidInteger(input);
+		switch (option) {
+		case UPDATE_CUSTOMER:
+			updateCustomerMenu(manager);
+			break;
+		case UPDATE_ACCOUNT:
+			updateAccountMenu(manager);
+			break;
+		case RETURN:
+			mainMenu(manager);
+			break;
+		default:
+			System.out.println("INVALID OPTION");
+			updateMenu(manager);
+			break;
+		}
+	}
+
+	private void updateCustomerMenu(Manager manager) throws SQLException {
+		String command = "Enter ID: ";
+		System.out.println(command);
+		int id = BankUtils.getValidInteger(input);
+		Customer customer = manager.getCustomer(id);
+		if (customer == null) {
+			System.out.println("No customer with ID: " + id);
+			updateMenu(manager);
+		} else {
+			updateCustomer(manager, customer);
+		}
+	}
+
+	private void updateCustomer(Manager manager, Customer customer) throws SQLException {
+		System.out.println(customer);
+		String command = "1. Update name\n2. Update manager\n0. RETURN";
+		System.out.println(command);
+		int option = BankUtils.getValidInteger(input);
+		switch (option) {
+		case UPDATE_NAME:
+			System.out.println("Enter new name: ");
+			String name = input.nextLine();
+			Customer newCustomer = customer;
+			newCustomer.setName(name);
+			if (manager.updateCustomer(customer, newCustomer)) {
+				System.out.println("UPDATED SUCCESSFULLY");
+			} else {
+				System.out.println("UPDATE NOT COMPLETE");
+			}
+			updateMenu(manager);
+			break;
+		case UPDATE_MANAGER:
+			System.out.println("Enter new manager ID: ");
+			int id = BankUtils.getValidInteger(input);
+			Manager newManager = mDao.findById(id);
+			if (newManager != null) {
+				Customer newCustomer1 = customer;
+				newCustomer1.setManagerId(id);
+				manager.updateCustomer(customer, newCustomer1);
+				System.out.println("UPDATED SUCCESSFULLY");
+			} else {
+				System.out.println("UPDATE NOT COMPLETE");
+			}
+			updateMenu(manager);
+			break;
+		case RETURN:
+			updateMenu(manager);
+			break;
+		default:
+			System.out.println("INVALID OPTION");
+			updateCustomer(manager, customer);
+			break;
+		}
+	}
+
+	private void updateAccountMenu(Manager manager) throws SQLException {
+		String command = "Enter ID of account: ";
+		System.out.println(command);
+		int id = BankUtils.getValidInteger(input);
+		Account account = manager.getAccount(id);
+		if (account.getId() == NULL_ACC) {
+			System.out.println("There isn't account with ID: " + id);
+			updateMenu(manager);
+		} else {
+			updateAccount(manager, account);
+		}
+	}
+
+	private void updateAccount(Manager manager, Account account) throws SQLException {
+		String command = "1. Charge\n2. Pull\n3. Transfer\n0. RETURN";
+		System.out.println(command);
+		int option = BankUtils.getValidInteger(input);
+		switch (option) {
+		case CHARGE:
+			System.out.println("Enter amount to charge: ");
+			int chargeAmount = BankUtils.getValidInteger(input);
+			manager.charge(account, chargeAmount);
+			System.out.println("CHARGED SUCCESSFULLY");
+			updateMenu(manager);
+			break;
+		case PULL:
+			System.out.println("Enter amount to pull: ");
+			int pullAmount = BankUtils.getValidInteger(input);
+			if (manager.pull(account, pullAmount)) {
+				System.out.println("PULL SUCCESSFULLY");
+			} else {
+				System.out.println("NOT ENOUGH BALANCE");
+			}
+			updateMenu(manager);
+			break;
+		case TRANSFER:
+			transferMenu(manager, account);
+			updateMenu(manager);
+			break;
+		case RETURN:
+			updateMenu(manager);
+		default:
+			System.out.println("INVALID OPTION");
+			updateAccount(manager, account);
+			break;
+		}
+	}
+
+	private void transferMenu(Manager manager, Account sender) throws SQLException {
+		String recieverId = "Enter reciever account ID: ";
+		System.out.println(recieverId);
+		int id = BankUtils.getValidInteger(input);
+		Account reciever = manager.getAccount(id);
+		if (reciever.getId() == NULL_ACC) {
+			System.out.println("There isn't account with ID: " + id);
+		} else {
+			System.out.println("Enter amount: ");
+			int amount = BankUtils.getValidInteger(input);
+			if (manager.transfer(sender, reciever, amount)) {
+				System.out.println("TRANSFER COMPLETED");
+			} else {
+				System.out.println("Not enough balance");
+			}
+		}
+	}
+
+	private void deleteMenu(Manager manager) throws SQLException {
+		String command = "1. Delete customer by ID\n2. Delete account by ID\n0. RETURN";
+		System.out.println(command);
+		int option = BankUtils.getValidInteger(input);
+		switch (option) {
+		case DELETE_CUSTOMER:
+			deleteCustomerMenu(manager);
+			deleteMenu(manager);
+			break;
+		case DELETE_ACCOUNT:
+			deleteAccountMenu(manager);
+			deleteMenu(manager);
+			break;
+		case RETURN:
+			mainMenu(manager);
+			break;
+		default:
+			System.out.println("INVALID OPTION");
+			deleteMenu(manager);
+			break;
+		}
+	}
+
+	private void deleteCustomerMenu(Manager manager) throws SQLException {
+		System.out.println("Enter ID of customer: ");
+		int id = BankUtils.getValidInteger(input);
+		if (manager.deleteCustomer(id)) {
+			System.out.println("Customer deleted");
+		} else {
+			System.err.println("No such customer with ID: " + id);
+		}
+	}
+
+	private void deleteAccountMenu(Manager manager) throws SQLException {
+		System.out.println("Enter ID of account: ");
+		int id = BankUtils.getValidInteger(input);
+		if (manager.deleteAccount(id)) {
+			System.out.println("Account deleted");
+		} else {
+			System.err.println("No such account with ID: " + id);
+		}
+	}
 }

@@ -67,7 +67,16 @@ public class Manager {
 		}
 		return canAdd;
 	}
-
+	
+	public boolean updateCustomer(Customer customer, Customer newCustomer) throws SQLException {
+		Customer currentCustomer = cDao.findById(customer.getId());
+		boolean canUpdate = currentCustomer != null;
+		if(canUpdate) {
+			cDao.update(customer, newCustomer);
+		}
+		return canUpdate;
+	}
+	
 	public boolean deleteAccount(int accountId) throws SQLException {
 		boolean canDelete = aDao.findById(accountId).getId() != INVALID_ID;
 		if (canDelete) {
@@ -126,10 +135,13 @@ public class Manager {
 		return isEnoughBalance;
 	}
 	
-	public void transfer(Account sender, Account reciever, double amount) throws SQLException {
+	public boolean transfer(Account sender, Account reciever, double amount) throws SQLException {
+		boolean transferCompleted = false;
 		if (pull(sender, amount)) {
 			charge(reciever, amount);
+			transferCompleted = true;
 		}
+		return transferCompleted;
 	}
 
 	public int getId() {
