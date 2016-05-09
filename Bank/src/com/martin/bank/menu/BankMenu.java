@@ -40,7 +40,6 @@ public class BankMenu {
 	private static final int RETURN = 0;
 	private static Scanner input = new Scanner(System.in);
 	private ManagerDao mDao = new ManagerDao();
-	String accountId = "Enter account id: ";
 
 	public void RegManager(String name) throws SQLException {
 		Manager manager = new Manager();
@@ -63,7 +62,7 @@ public class BankMenu {
 
 	private void mainMenu(Manager manager) throws SQLException {
 		System.out.println("\tMAIN MENU");
-		System.out.println("1. Get\n2. Add\n3. Delete\n4. Update");
+		System.out.println("1. Read\n2. Add\n3. Delete\n4. Update");
 		System.out.println("0. Log out");
 		int option = BankUtils.getValidInteger(input);
 		switch (option) {
@@ -83,7 +82,7 @@ public class BankMenu {
 			logIn();
 			break;
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			mainMenu(manager);
 			break;
 		}
@@ -100,7 +99,7 @@ public class BankMenu {
 	}
 
 	private void readMenu(Manager manager) throws SQLException {
-		String command = "1. Get all customers\n" + "2. Find customer by ID\n" + "3. Get all accounts\n"
+		String command = "\tREAD MENU\n1. Get all customers\n" + "2. Find customer by ID\n" + "3. Get all accounts\n"
 				+ "4. Get customer accounts\n" + "5. Find account by ID\n" + "0. RETURN";
 		System.out.println(command);
 		int option = BankUtils.getValidInteger(input);
@@ -128,7 +127,7 @@ public class BankMenu {
 		case RETURN:
 			mainMenu(manager);
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			readMenu(manager);
 			break;
 		}
@@ -139,7 +138,7 @@ public class BankMenu {
 		if (foundCustomer != null) {
 			System.out.println(foundCustomer);
 		} else {
-			System.out.println("No such customer");
+			System.err.println("No such customer");
 		}
 	}
 
@@ -148,7 +147,7 @@ public class BankMenu {
 		if (foundCustomer != null) {
 			System.out.println(manager.getCustomerAccounts(foundCustomer));
 		} else {
-			System.out.println("No such customer");
+			System.err.println("No such customer");
 		}
 	}
 
@@ -163,14 +162,14 @@ public class BankMenu {
 		int id = BankUtils.getValidInteger(input);
 		Account foundAccount = manager.getAccount(id);
 		if (foundAccount.getId() == NULL_ACC) {
-			System.out.println("No such account");
+			System.err.println("No such account with ID: " + id);
 		} else {
 			System.out.println(foundAccount);
 		}
 	}
 
 	private void addMenu(Manager manager) throws SQLException {
-		String command = "Enter option\n1. Add customer\n2. Add account\n0. RETURN";
+		String command = "\tADD MENU\n1. Add customer\n2. Add account\n0. RETURN";
 		System.out.println(command);
 		int option = BankUtils.getValidInteger(input);
 		switch (option) {
@@ -186,7 +185,7 @@ public class BankMenu {
 			mainMenu(manager);
 			break;
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			addMenu(manager);
 			break;
 		}
@@ -229,14 +228,14 @@ public class BankMenu {
 				System.out.println("Savings added");
 				break;
 			default:
-				System.out.println("INVALID OPTION");
+				System.err.println("INVALID OPTION");
 				break;
 			}
 		}
 	}
 
 	private void updateMenu(Manager manager) throws SQLException {
-		String command = "1. Update customer\n2. Update account\n0. RETURN";
+		String command = "\tUPDATE MENU\n1. Update customer\n2. Update account\n0. RETURN";
 		System.out.println(command);
 		int option = BankUtils.getValidInteger(input);
 		switch (option) {
@@ -250,7 +249,7 @@ public class BankMenu {
 			mainMenu(manager);
 			break;
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			updateMenu(manager);
 			break;
 		}
@@ -262,7 +261,7 @@ public class BankMenu {
 		int id = BankUtils.getValidInteger(input);
 		Customer customer = manager.getCustomer(id);
 		if (customer == null) {
-			System.out.println("No customer with ID: " + id);
+			System.err.println("No customer with ID: " + id);
 			updateMenu(manager);
 		} else {
 			updateCustomer(manager, customer);
@@ -281,9 +280,9 @@ public class BankMenu {
 			Customer newCustomer = customer;
 			newCustomer.setName(name);
 			if (manager.updateCustomer(customer, newCustomer)) {
-				System.out.println("UPDATED SUCCESSFULLY");
+				System.out.println("Updated successfully");
 			} else {
-				System.out.println("UPDATE NOT COMPLETE");
+				System.err.println("Update not complete");
 			}
 			updateMenu(manager);
 			break;
@@ -295,9 +294,9 @@ public class BankMenu {
 				Customer newCustomer1 = customer;
 				newCustomer1.setManagerId(id);
 				manager.updateCustomer(customer, newCustomer1);
-				System.out.println("UPDATED SUCCESSFULLY");
+				System.out.println("Update successfully");
 			} else {
-				System.out.println("UPDATE NOT COMPLETE");
+				System.err.println("No such manager with ID: " + id);
 			}
 			updateMenu(manager);
 			break;
@@ -305,7 +304,7 @@ public class BankMenu {
 			updateMenu(manager);
 			break;
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			updateCustomer(manager, customer);
 			break;
 		}
@@ -317,7 +316,7 @@ public class BankMenu {
 		int id = BankUtils.getValidInteger(input);
 		Account account = manager.getAccount(id);
 		if (account.getId() == NULL_ACC) {
-			System.out.println("There isn't account with ID: " + id);
+			System.err.println("No such account with ID: " + id);
 			updateMenu(manager);
 		} else {
 			updateAccount(manager, account);
@@ -333,16 +332,16 @@ public class BankMenu {
 			System.out.println("Enter amount to charge: ");
 			int chargeAmount = BankUtils.getValidInteger(input);
 			manager.charge(account, chargeAmount);
-			System.out.println("CHARGED SUCCESSFULLY");
+			System.out.println("Charged successfully");
 			updateMenu(manager);
 			break;
 		case PULL:
 			System.out.println("Enter amount to pull: ");
 			int pullAmount = BankUtils.getValidInteger(input);
 			if (manager.pull(account, pullAmount)) {
-				System.out.println("PULL SUCCESSFULLY");
+				System.out.println("Pull successfully");
 			} else {
-				System.out.println("NOT ENOUGH BALANCE");
+				System.err.println("Not enough balance");
 			}
 			updateMenu(manager);
 			break;
@@ -353,7 +352,7 @@ public class BankMenu {
 		case RETURN:
 			updateMenu(manager);
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			updateAccount(manager, account);
 			break;
 		}
@@ -365,20 +364,20 @@ public class BankMenu {
 		int id = BankUtils.getValidInteger(input);
 		Account reciever = manager.getAccount(id);
 		if (reciever.getId() == NULL_ACC) {
-			System.out.println("There isn't account with ID: " + id);
+			System.err.println("There isn't account with ID: " + id);
 		} else {
 			System.out.println("Enter amount: ");
 			int amount = BankUtils.getValidInteger(input);
 			if (manager.transfer(sender, reciever, amount)) {
-				System.out.println("TRANSFER COMPLETED");
+				System.out.println("Transfer completed");
 			} else {
-				System.out.println("Not enough balance");
+				System.err.println("Not enough balance");
 			}
 		}
 	}
 
 	private void deleteMenu(Manager manager) throws SQLException {
-		String command = "1. Delete customer by ID\n2. Delete account by ID\n0. RETURN";
+		String command = "\tDELETE MENU\n1. Delete customer by ID\n2. Delete account by ID\n0. RETURN";
 		System.out.println(command);
 		int option = BankUtils.getValidInteger(input);
 		switch (option) {
@@ -394,7 +393,7 @@ public class BankMenu {
 			mainMenu(manager);
 			break;
 		default:
-			System.out.println("INVALID OPTION");
+			System.err.println("INVALID OPTION");
 			deleteMenu(manager);
 			break;
 		}

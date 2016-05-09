@@ -10,7 +10,7 @@ public class RunBank {
 		da.deleteAllTables();
 		BankMenu menu = new BankMenu();
 		menu.RegManager("BOSS");
-		menu.RegManager("4i4o");
+		menu.RegManager("employee");
 		menu.logIn();
 	}
 }
